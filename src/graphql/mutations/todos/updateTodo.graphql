@@ -1,0 +1,5 @@
+mutation UpdateTodo($id: String!, $data: TodoProps!) {
+  updateTodo(id: $id, data: $data) {
+    ...TodoResponseFragment
+  }
+}

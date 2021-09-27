@@ -1,0 +1,5 @@
+mutation CreateTodo($data: TodoProps!) {
+  createTodo(data: $data) {
+    ...TodoResponseFragment
+  }
+}

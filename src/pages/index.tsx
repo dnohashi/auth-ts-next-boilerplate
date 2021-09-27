@@ -40,6 +40,10 @@ const Index = () => {
         size="large"
         onClick={handleLogout}
       />
+      {/* 
+				Add List Component
+					For each item from backend, render ListCard component
+			 */}
     </Container>
   );
 };
