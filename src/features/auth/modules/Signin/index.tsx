@@ -8,6 +8,7 @@ import { MeDocument, useSigninMutation } from 'generated/graphql';
 import handleErrors from 'helpers/handleErrors';
 import useAuth from 'features/auth/hooks/useAuth';
 import Loading from 'ui/components/Loading';
+import RowContainer from 'ui/components/RowContainer';
 
 const Signin = () => {
   const router = useRouter();
@@ -66,14 +67,7 @@ const Signin = () => {
           <Form>
             <InputField name="email" label="Email" type="email" />
             <InputField name="password" label="Password" type="password" />
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
+            <RowContainer>
               <Button
                 title="Need an account?"
                 size="large"
@@ -85,7 +79,7 @@ const Signin = () => {
                 size="large"
                 type="submit"
               />
-            </div>
+            </RowContainer>
           </Form>
         )}
       </Formik>

@@ -3,6 +3,8 @@ import type { InputHTMLAttributes, ReactNode } from 'react';
 export interface RowContainerProps {
   isLoading?: boolean;
   children: React.ReactNode;
+  paddingLeft?: number;
+  paddingRight?: number;
 }
 
 export interface ButtonProps {

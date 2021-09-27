@@ -1,9 +1,11 @@
 import { useApolloClient } from '@apollo/client';
 import useAuth from 'features/auth/hooks/useAuth';
+import Todos from 'features/todos/modules/Todos';
 import { useLogoutMutation } from 'generated/graphql';
 import { useRouter } from 'next/router';
 import Button from 'ui/components/Button';
 import Container from 'ui/components/Container';
+import RowContainer from 'ui/components/RowContainer';
 import Loading from 'ui/components/Loading';
 import Typography from 'ui/components/Typography';
 import { withApollo } from 'utils/withApollo';
@@ -28,23 +30,24 @@ const Index = () => {
   };
 
   return (
-    <Container>
-      <Typography as="h1" fontSize={42} align="center" fontWeight={700}>
-        Welcome {data?.me.user.username}
-      </Typography>
-      <Button
-        disabled={logoutLoading}
-        title="Logout"
-        type="button"
-        variant="primary"
-        size="large"
-        onClick={handleLogout}
-      />
-      {/* 
-				Add List Component
-					For each item from backend, render ListCard component
-			 */}
-    </Container>
+    <>
+      <RowContainer paddingLeft={8} paddingRight={8}>
+        <Typography as="h2" fontSize={30} align="center" fontWeight={700}>
+          Welcome {data?.me.user.username}!
+        </Typography>
+        <Button
+          disabled={logoutLoading}
+          title="Logout"
+          type="button"
+          variant="primary"
+          size="large"
+          onClick={handleLogout}
+        />
+      </RowContainer>
+      <Container>
+        <Todos />
+      </Container>
+    </>
   );
 };
 
