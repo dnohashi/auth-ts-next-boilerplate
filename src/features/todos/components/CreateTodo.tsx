@@ -13,7 +13,7 @@ const CreateTodo = ({ onCreate = () => {} }): JSX.Element => {
   function handleClearInputs() {}
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       <Typography as="h3" fontSize={24} align="center" fontWeight={700}>
         Add Todo
       </Typography>
