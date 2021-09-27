@@ -4,7 +4,6 @@ import Todos from 'features/todos/modules/Todos';
 import { useLogoutMutation } from 'generated/graphql';
 import { useRouter } from 'next/router';
 import Button from 'ui/components/Button';
-import Container from 'ui/components/Container';
 import RowContainer from 'ui/components/RowContainer';
 import Loading from 'ui/components/Loading';
 import Typography from 'ui/components/Typography';
@@ -44,9 +43,7 @@ const Index = () => {
           onClick={handleLogout}
         />
       </RowContainer>
-      <Container>
-        <Todos />
-      </Container>
+      <Todos />
     </>
   );
 };

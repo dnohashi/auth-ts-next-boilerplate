@@ -1,5 +1,5 @@
-query Todos {
+query todos {
   todos {
-    ...TodoResponseFragment
+    ...TodosResponseFragment
   }
 }

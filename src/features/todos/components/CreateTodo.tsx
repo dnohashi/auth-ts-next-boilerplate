@@ -26,7 +26,6 @@ const CreateTodo = ({ onCreate }): JSX.Element => {
       variables: {
         data: { ...values },
       },
-      awaitRefetchQueries: true,
     });
 
     const errors = response.data?.createTodo.errors;

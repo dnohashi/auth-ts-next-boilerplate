@@ -1,0 +1,15 @@
+fragment TodosResponseFragment on TodoResponse {
+  errors {
+    field
+    message
+  }
+  message
+  todos {
+    id
+    title
+    createdAt
+    updatedAt
+    completedAt
+    deletedAt
+  }
+}

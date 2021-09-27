@@ -34,6 +34,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createTodo: TodoResponse;
   deleteTodo: TodoResponse;
+  completeTodo: TodoResponse;
   updateTodo: TodoResponse;
   signup: UserResponse;
   signin: UserResponse;
@@ -47,6 +48,10 @@ export type MutationCreateTodoArgs = {
 };
 
 export type MutationDeleteTodoArgs = {
+  id: Scalars['String'];
+};
+
+export type MutationCompleteTodoArgs = {
   id: Scalars['String'];
 };
 
@@ -193,6 +198,27 @@ export type TodoResponseFragmentFragment = {
     >;
   };
 
+export type TodosResponseFragmentFragment = {
+  __typename?: 'TodoResponse';
+} & Pick<TodoResponse, 'message'> & {
+    errors?: Maybe<
+      Array<{ __typename?: 'FormError' } & Pick<FormError, 'field' | 'message'>>
+    >;
+    todos?: Maybe<
+      Array<
+        { __typename?: 'Todo' } & Pick<
+          Todo,
+          | 'id'
+          | 'title'
+          | 'createdAt'
+          | 'updatedAt'
+          | 'completedAt'
+          | 'deletedAt'
+        >
+      >
+    >;
+  };
+
 export type UserResponseFragmentFragment = {
   __typename?: 'UserResponse';
 } & Pick<UserResponse, 'message'> & {
@@ -224,6 +250,14 @@ export type SignupMutationVariables = Exact<{
 
 export type SignupMutation = { __typename?: 'Mutation' } & {
   signup: { __typename?: 'UserResponse' } & UserResponseFragmentFragment;
+};
+
+export type CompleteTodoMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+export type CompleteTodoMutation = { __typename?: 'Mutation' } & {
+  completeTodo: { __typename?: 'TodoResponse' } & TodoResponseFragmentFragment;
 };
 
 export type CreateTodoMutationVariables = Exact<{
@@ -260,7 +294,7 @@ export type MeQuery = { __typename?: 'Query' } & {
 export type TodosQueryVariables = Exact<{ [key: string]: never }>;
 
 export type TodosQuery = { __typename?: 'Query' } & {
-  todos: { __typename?: 'TodoResponse' } & TodoResponseFragmentFragment;
+  todos: { __typename?: 'TodoResponse' } & TodosResponseFragmentFragment;
 };
 
 export const TodoResponseFragmentFragmentDoc = gql`
@@ -271,6 +305,23 @@ export const TodoResponseFragmentFragmentDoc = gql`
     }
     message
     todo {
+      id
+      title
+      createdAt
+      updatedAt
+      completedAt
+      deletedAt
+    }
+  }
+`;
+export const TodosResponseFragmentFragmentDoc = gql`
+  fragment TodosResponseFragment on TodoResponse {
+    errors {
+      field
+      message
+    }
+    message
+    todos {
       id
       title
       createdAt
@@ -436,6 +487,57 @@ export type SignupMutationResult = Apollo.MutationResult<SignupMutation>;
 export type SignupMutationOptions = Apollo.BaseMutationOptions<
   SignupMutation,
   SignupMutationVariables
+>;
+export const CompleteTodoDocument = gql`
+  mutation CompleteTodo($id: String!) {
+    completeTodo(id: $id) {
+      ...TodoResponseFragment
+    }
+  }
+  ${TodoResponseFragmentFragmentDoc}
+`;
+export type CompleteTodoMutationFn = Apollo.MutationFunction<
+  CompleteTodoMutation,
+  CompleteTodoMutationVariables
+>;
+
+/**
+ * __useCompleteTodoMutation__
+ *
+ * To run a mutation, you first call `useCompleteTodoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCompleteTodoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [completeTodoMutation, { data, loading, error }] = useCompleteTodoMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useCompleteTodoMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CompleteTodoMutation,
+    CompleteTodoMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CompleteTodoMutation,
+    CompleteTodoMutationVariables
+  >(CompleteTodoDocument, options);
+}
+export type CompleteTodoMutationHookResult = ReturnType<
+  typeof useCompleteTodoMutation
+>;
+export type CompleteTodoMutationResult =
+  Apollo.MutationResult<CompleteTodoMutation>;
+export type CompleteTodoMutationOptions = Apollo.BaseMutationOptions<
+  CompleteTodoMutation,
+  CompleteTodoMutationVariables
 >;
 export const CreateTodoDocument = gql`
   mutation CreateTodo($data: TodoProps!) {
@@ -631,12 +733,12 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const TodosDocument = gql`
-  query Todos {
+  query todos {
     todos {
-      ...TodoResponseFragment
+      ...TodosResponseFragment
     }
   }
-  ${TodoResponseFragmentFragmentDoc}
+  ${TodosResponseFragmentFragmentDoc}
 `;
 
 /**

@@ -1,0 +1,5 @@
+mutation CompleteTodo($id: String!) {
+  completeTodo(id: $id) {
+    ...TodoResponseFragment
+  }
+}
