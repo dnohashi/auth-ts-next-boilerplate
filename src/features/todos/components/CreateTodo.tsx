@@ -5,6 +5,7 @@ import InputField from 'ui/components/InputField';
 import Typography from 'ui/components/Typography';
 import { useCreateTodoMutation } from 'generated/graphql';
 import handleErrors from 'helpers/handleErrors';
+import Card from 'ui/components/Card';
 import RowContainer from 'ui/components/RowContainer';
 
 const CreateTodo = ({ onCreate }): JSX.Element => {
@@ -40,7 +41,7 @@ const CreateTodo = ({ onCreate }): JSX.Element => {
   }
 
   return (
-    <div style={{ width: '100%' }}>
+    <Card>
       <Typography as="h3" fontSize={24} align="center" fontWeight={700}>
         Add Todo
       </Typography>
@@ -64,7 +65,7 @@ const CreateTodo = ({ onCreate }): JSX.Element => {
           </Form>
         )}
       </Formik>
-    </div>
+    </Card>
   );
 };
 

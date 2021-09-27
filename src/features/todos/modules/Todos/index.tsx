@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import CreateTodo from 'features/todos/components/CreateTodo';
-// import TodoList from 'features/todos/components/TodoList';
+import TodoList from 'features/todos/components/TodoList';
 import Container from 'ui/components/Container';
 
 const Todos = () => {
   const [todos, setTodos] = useState([]);
 
   function addTodos(todo): void {
-    console.log('Added todo: ', todo);
     setTodos((previousTodos) => [...previousTodos, todo]);
   }
 
@@ -25,7 +24,7 @@ const Todos = () => {
   return (
     <Container>
       <CreateTodo onCreate={addTodos} />
-      {/* <TodoList todos={todos} onDelete={deleteTodo} onComplete={completeTodo} /> */}
+      <TodoList todos={todos} onDelete={deleteTodo} onComplete={completeTodo} />
     </Container>
   );
 };
