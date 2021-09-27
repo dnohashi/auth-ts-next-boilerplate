@@ -6,8 +6,9 @@ import Container from 'ui/components/Container';
 const Todos = () => {
   const [todos, setTodos] = useState([]);
 
-  function addTodos(todos = []): void {
-    setTodos((previousTodos) => [...previousTodos, ...todos]);
+  function addTodos(todo): void {
+    console.log('Added todo: ', todo);
+    setTodos((previousTodos) => [...previousTodos, todo]);
   }
 
   function deleteTodo(id: string): void {

@@ -7,7 +7,7 @@ import { CreateTodoDocument, useCreateTodoMutation } from 'generated/graphql';
 import handleErrors from 'helpers/handleErrors';
 import RowContainer from 'ui/components/RowContainer';
 
-const CreateTodo = ({ onCreate = () => {} }): JSX.Element => {
+const CreateTodo = ({ onCreate }): JSX.Element => {
   const [createTodo] = useCreateTodoMutation();
 
   function handleClearInputs() {}
@@ -27,22 +27,25 @@ const CreateTodo = ({ onCreate = () => {} }): JSX.Element => {
         onSubmit={async (values, { setErrors, setSubmitting }) => {
           const response = await createTodo({
             variables: {
-              title: values.title,
+              data: { ...values },
             },
             awaitRefetchQueries: true,
           });
 
           console.log('RESPONSE: ', response);
 
-          // const errors = response.data?.todo.errors;
+          // response.data.createTodo.errors, message or todo
 
-          // if (errors) {
-          //   setErrors(handleErrors(errors));
-          //   setSubmitting(false);
-          // } else if (response.data?.todo) {
-          //   // Push to todos
-          // onCreate
-          // }
+          const errors = response.data.createTodo.errors;
+          const todo = response.data?.createTodo.todo;
+
+          if (errors) {
+            setErrors(handleErrors(errors));
+            setSubmitting(false);
+          } else if (todo) {
+            // Push to todos
+            onCreate(todo);
+          }
         }}
       >
         {() => (
