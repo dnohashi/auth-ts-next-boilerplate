@@ -4,10 +4,12 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
 };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
-  { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
-  { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
 const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -30,11 +32,27 @@ export type FormError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createTodo: TodoResponse;
+  deleteTodo: TodoResponse;
+  updateTodo: TodoResponse;
   signup: UserResponse;
   signin: UserResponse;
   logout: UserResponse;
   requestResetToken: ResetPasswordResponse;
   resetPassword: ResetPasswordResponse;
+};
+
+export type MutationCreateTodoArgs = {
+  data: TodoProps;
+};
+
+export type MutationDeleteTodoArgs = {
+  id: Scalars['String'];
+};
+
+export type MutationUpdateTodoArgs = {
+  data: TodoProps;
+  id: Scalars['String'];
 };
 
 export type MutationSignupArgs = {
@@ -55,6 +73,7 @@ export type MutationResetPasswordArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  readTodos: TodoResponse;
   me?: Maybe<UserResponse>;
   getUser?: Maybe<UserResponse>;
 };
@@ -88,6 +107,31 @@ export type ResetPasswordResponse = {
   __typename?: 'ResetPasswordResponse';
   token?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<FormError>>;
+};
+
+export type Todo = {
+  __typename?: 'Todo';
+  id: Scalars['ID'];
+  userId: Scalars['ID'];
+  title: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+  createdAt: Scalars['DateTime'];
+  deletedAt?: Maybe<Scalars['DateTime']>;
+  completedAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type TodoProps = {
+  title: Scalars['String'];
+  completedAt?: Maybe<Scalars['DateTime']>;
+  deletedAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type TodoResponse = {
+  __typename?: 'TodoResponse';
+  errors?: Maybe<Array<FormError>>;
+  todos?: Maybe<Array<Todo>>;
+  todo?: Maybe<Todo>;
+  message?: Maybe<Scalars['String']>;
 };
 
 export type User = {

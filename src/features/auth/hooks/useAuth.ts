@@ -6,6 +6,7 @@ const useAuth = () => {
   const router = useRouter();
   const { data, loading } = useMeQuery();
 
+  // Navigate user to signin if not authenticated
   useEffect(() => {
     if (
       router.isReady &&

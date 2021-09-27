@@ -3,6 +3,7 @@ import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
 import Layout from 'features/auth/components/Layout';
 import Button from 'ui/components/Button';
+import RowContainer from 'ui/components/RowContainer';
 import InputField from 'ui/components/InputField';
 import { MeDocument, useSignupMutation } from 'generated/graphql';
 import handleErrors from 'helpers/handleErrors';
@@ -10,6 +11,10 @@ import handleErrors from 'helpers/handleErrors';
 const Signup = () => {
   const router = useRouter();
   const [signup] = useSignupMutation();
+
+  function handleHistoryPop() {
+    router.push('/signin');
+  }
 
   return (
     <Layout>
@@ -54,12 +59,15 @@ const Signup = () => {
             <InputField name="username" label="Username" type="text" />
             <InputField name="email" label="Email" type="email" />
             <InputField name="password" label="Password" type="password" />
-            <Button
-              title="Sign Up"
-              variant="primary"
-              size="large"
-              type="submit"
-            />
+            <RowContainer>
+              <Button title="Go back" size="large" onClick={handleHistoryPop} />
+              <Button
+                title="Sign Up"
+                variant="primary"
+                size="large"
+                type="submit"
+              />
+            </RowContainer>
           </Form>
         )}
       </Formik>

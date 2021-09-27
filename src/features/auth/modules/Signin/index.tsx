@@ -23,6 +23,10 @@ const Signin = () => {
     return null;
   }
 
+  function handleNavigationToSignUp() {
+    router.push('/signup');
+  }
+
   return (
     <Layout>
       <Formik
@@ -62,12 +66,26 @@ const Signin = () => {
           <Form>
             <InputField name="email" label="Email" type="email" />
             <InputField name="password" label="Password" type="password" />
-            <Button
-              title="Sign In"
-              variant="primary"
-              size="large"
-              type="submit"
-            />
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Button
+                title="Need an account?"
+                size="large"
+                onClick={handleNavigationToSignUp}
+              />
+              <Button
+                title="Sign In"
+                variant="primary"
+                size="large"
+                type="submit"
+              />
+            </div>
           </Form>
         )}
       </Formik>

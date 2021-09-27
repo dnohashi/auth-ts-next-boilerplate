@@ -1,5 +1,10 @@
 import type { InputHTMLAttributes, ReactNode } from 'react';
 
+export interface RowContainerProps {
+  isLoading?: boolean;
+  children: React.ReactNode;
+}
+
 export interface ButtonProps {
   title: string;
   wide?: boolean;
