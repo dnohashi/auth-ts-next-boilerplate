@@ -5,6 +5,7 @@ export interface RowContainerProps {
   children: React.ReactNode;
   paddingLeft?: number;
   paddingRight?: number;
+  justify?: string;
 }
 
 export interface ButtonProps {

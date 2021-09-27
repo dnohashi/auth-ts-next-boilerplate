@@ -2,48 +2,43 @@ import * as Yup from 'yup';
 import { Form, Formik } from 'formik';
 import Button from 'ui/components/Button';
 import InputField from 'ui/components/InputField';
-import Typography from 'ui/components/Typography';
-import { useCreateTodoMutation } from 'generated/graphql';
+import { useUpdateTodoMutation } from 'generated/graphql';
 import handleErrors from 'helpers/handleErrors';
 import Card from 'ui/components/Card';
 import RowContainer from 'ui/components/RowContainer';
 
-const CreateTodo = ({ onCreate }): JSX.Element => {
-  const [createTodo] = useCreateTodoMutation();
+const EditTodoCard = ({ id, title, onUpdate }): JSX.Element => {
+  const [updateTodo] = useUpdateTodoMutation();
 
   const initialValues = {
-    title: '',
+    title,
   };
 
   const validationSchema = Yup.object().shape({
     title: Yup.string().required(),
   });
 
-  function handleClearInputs() {}
-
   async function handleOnSubmit(values, { setErrors, setSubmitting }) {
-    const response = await createTodo({
+    const response = await updateTodo({
       variables: {
+        id,
         data: { ...values },
       },
     });
 
-    const errors = response.data?.createTodo.errors;
-    const todo = response.data?.createTodo.todo;
+    const errors = response.data?.updateTodo.errors;
+    const todo = response.data?.updateTodo.todo;
 
     if (errors) {
       setErrors(handleErrors(errors));
       setSubmitting(false);
     } else if (todo) {
-      onCreate(todo);
+      onUpdate(todo);
     }
   }
 
   return (
     <Card>
-      <Typography as="h3" fontSize={24} align="center" fontWeight={700}>
-        Add Todo
-      </Typography>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -52,10 +47,9 @@ const CreateTodo = ({ onCreate }): JSX.Element => {
         {() => (
           <Form>
             <InputField name="title" label="Title" type="text" />
-            <RowContainer>
-              <Button title="Clear" size="large" onClick={handleClearInputs} />
+            <RowContainer justify="flex-end">
               <Button
-                title="Create"
+                title="Save"
                 variant="primary"
                 size="large"
                 type="submit"
@@ -68,4 +62,4 @@ const CreateTodo = ({ onCreate }): JSX.Element => {
   );
 };
 
-export default CreateTodo;
+export default EditTodoCard;

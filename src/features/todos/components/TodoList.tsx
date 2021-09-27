@@ -1,10 +1,16 @@
-import Button from 'ui/components/Button';
-import Card from 'ui/components/Card';
+import EditTodoCard from './EditTodoCard';
 import Container from 'ui/components/Container';
-import RowContainer from 'ui/components/RowContainer';
-import Typography from 'ui/components/Typography';
+import TodoCard from './TodoCard';
 
-const TodoList = ({ todos, onComplete, onDelete, onEdit }) => {
+const TodoList = ({
+  editId,
+  todos,
+  onComplete,
+  onDelete,
+  onReset,
+  onSetEdit,
+  onUpdate,
+}) => {
   const handleOnComplete = (id) => () => {
     onComplete(id);
   };
@@ -13,38 +19,39 @@ const TodoList = ({ todos, onComplete, onDelete, onEdit }) => {
     onDelete(id);
   };
 
+  const handleOnSetEdit = (id) => () => {
+    onSetEdit(id);
+  };
+
+  const handleOnReset = (id) => () => {
+    onReset(id);
+  };
+
   return (
     <Container>
       {todos.map(
-        ({ id, title, completedAt }: { id: string; title: string }) => (
-          <Card key={id}>
-            <Typography as="h4" fontSize={20}>
-              <b>Title:</b> {title}
-            </Typography>
-            <Typography as="h4" fontSize={20}>
-              <b>Status:</b> {completedAt ? 'Completed' : 'In Progress'}
-            </Typography>
-            <RowContainer>
-              <Button
-                title="Delete"
-                size="large"
-                variant="ghost"
-                onClick={onDelete}
-              />
-              <span style={{ width: '30%' }}>
-                <RowContainer>
-                  <Button title="Edit" size="large" onClick={onComplete} />
-                  <Button
-                    title="Complete"
-                    variant="primary"
-                    size="large"
-                    onClick={onComplete}
-                  />
-                </RowContainer>
-              </span>
-            </RowContainer>
-          </Card>
-        )
+        ({
+          id,
+          title,
+          completedAt,
+        }: {
+          id: string;
+          title: string;
+          completedAt?: Date;
+        }) =>
+          editId === id ? (
+            <EditTodoCard key={id} id={id} title={title} onUpdate={onUpdate} />
+          ) : (
+            <TodoCard
+              key={id}
+              title={title}
+              completedAt={completedAt}
+              onDelete={handleOnDelete(id)}
+              onSetEdit={handleOnSetEdit(id)}
+              onComplete={handleOnComplete(id)}
+              onReset={handleOnReset(id)}
+            />
+          )
       )}
     </Container>
   );

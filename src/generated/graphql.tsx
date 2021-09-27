@@ -35,6 +35,7 @@ export type Mutation = {
   createTodo: TodoResponse;
   deleteTodo: TodoResponse;
   completeTodo: TodoResponse;
+  resetTodo: TodoResponse;
   updateTodo: TodoResponse;
   signup: UserResponse;
   signin: UserResponse;
@@ -52,6 +53,10 @@ export type MutationDeleteTodoArgs = {
 };
 
 export type MutationCompleteTodoArgs = {
+  id: Scalars['String'];
+};
+
+export type MutationResetTodoArgs = {
   id: Scalars['String'];
 };
 
@@ -274,6 +279,14 @@ export type DeleteTodoMutationVariables = Exact<{
 
 export type DeleteTodoMutation = { __typename?: 'Mutation' } & {
   deleteTodo: { __typename?: 'TodoResponse' } & TodoResponseFragmentFragment;
+};
+
+export type ResetTodoMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+export type ResetTodoMutation = { __typename?: 'Mutation' } & {
+  resetTodo: { __typename?: 'TodoResponse' } & TodoResponseFragmentFragment;
 };
 
 export type UpdateTodoMutationVariables = Exact<{
@@ -640,6 +653,56 @@ export type DeleteTodoMutationResult =
 export type DeleteTodoMutationOptions = Apollo.BaseMutationOptions<
   DeleteTodoMutation,
   DeleteTodoMutationVariables
+>;
+export const ResetTodoDocument = gql`
+  mutation ResetTodo($id: String!) {
+    resetTodo(id: $id) {
+      ...TodoResponseFragment
+    }
+  }
+  ${TodoResponseFragmentFragmentDoc}
+`;
+export type ResetTodoMutationFn = Apollo.MutationFunction<
+  ResetTodoMutation,
+  ResetTodoMutationVariables
+>;
+
+/**
+ * __useResetTodoMutation__
+ *
+ * To run a mutation, you first call `useResetTodoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useResetTodoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [resetTodoMutation, { data, loading, error }] = useResetTodoMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useResetTodoMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ResetTodoMutation,
+    ResetTodoMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<ResetTodoMutation, ResetTodoMutationVariables>(
+    ResetTodoDocument,
+    options
+  );
+}
+export type ResetTodoMutationHookResult = ReturnType<
+  typeof useResetTodoMutation
+>;
+export type ResetTodoMutationResult = Apollo.MutationResult<ResetTodoMutation>;
+export type ResetTodoMutationOptions = Apollo.BaseMutationOptions<
+  ResetTodoMutation,
+  ResetTodoMutationVariables
 >;
 export const UpdateTodoDocument = gql`
   mutation UpdateTodo($id: String!, $data: TodoProps!) {

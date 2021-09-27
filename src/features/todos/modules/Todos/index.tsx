@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import CreateTodo from 'features/todos/components/CreateTodo';
+import CreateTodoCard from 'features/todos/components/CreateTodoCard';
 import {
-  useUpdateTodoMutation,
+  useResetTodoMutation,
   useCompleteTodoMutation,
   useDeleteTodoMutation,
   useTodosQuery,
@@ -12,36 +12,46 @@ import Container from 'ui/components/Container';
 import Spinner from 'ui/components/Spinner';
 
 const Todos = () => {
+  // Local state
   const [todosById, setTodosById] = useState({});
-  const [updateTodo] = useUpdateTodoMutation();
+  const [editId, setEditId] = useState(null);
+
+  // GraphQL
   const [completeTodo] = useCompleteTodoMutation();
   const [deleteTodo] = useDeleteTodoMutation();
+  const [resetTodo] = useResetTodoMutation();
   const { data, loading } = useTodosQuery();
 
+  // Lifecycle
   useEffect(() => {
     const todos = data?.todos?.todos ?? [];
 
     setTodosById(keyBy(todos, 'id'));
   }, [data?.todos?.todos]);
 
-  async function handleAddTodos(todo): void {
+  // Handlers
+  const handleAddTodos = async (todo): void => {
     setTodosById((previousTodosById) => ({
       ...previousTodosById,
       [todo.id]: todo,
     }));
-  }
+  };
 
-  async function handleDeleteTodo(id: string): Promise<void> {
+  const handleDeleteTodo = async (id: string): Promise<void> => {
     await deleteTodo({
       variables: {
         id,
       },
     });
 
-    setTodosById((previousTodosById) => delete previousTodosById[id]);
-  }
+    setTodosById((previousTodosById) => {
+      delete previousTodosById[id];
 
-  async function handleCompleteTodo(id: string): Promise<void> {
+      return { ...previousTodosById };
+    });
+  };
+
+  const handleCompleteTodo = async (id: string): Promise<void> => {
     const response = await completeTodo({
       variables: {
         id,
@@ -55,36 +65,52 @@ const Todos = () => {
 
       return { ...previousTodosById };
     });
-  }
+  };
 
-  async function handleEditTodo(id, data) {
-    const response = await updateTodo({
+  const handleUpdateTodo = async (updatedTodo) => {
+    setTodosById((previousTodosById) => {
+      previousTodosById[updatedTodo.id] = { ...updatedTodo };
+
+      return { ...previousTodosById };
+    });
+
+    setEditId(null);
+  };
+
+  const handleSetEdit = (id) => {
+    setEditId(id);
+  };
+
+  const handleResetTodo = async (id) => {
+    const response = await resetTodo({
       variables: {
         id,
-        data,
       },
     });
 
-    const updatedTodo = response.data?.updateTodo?.todo ?? {};
+    const updatedTodo = response.data?.resetTodo?.todo ?? {};
 
     setTodosById((previousTodosById) => {
       previousTodosById[id] = { ...updatedTodo };
 
       return { ...previousTodosById };
     });
-  }
+  };
 
   return (
     <Container>
-      <CreateTodo onCreate={handleAddTodos} />
+      <CreateTodoCard onCreate={handleAddTodos} />
       {loading ? (
         <Spinner />
       ) : (
         <TodoList
+          editId={editId}
           todos={Object.values(todosById)}
           onDelete={handleDeleteTodo}
           onComplete={handleCompleteTodo}
-          onEdit={handleEditTodo}
+          onUpdate={handleUpdateTodo}
+          onSetEdit={handleSetEdit}
+          onReset={handleResetTodo}
         />
       )}
     </Container>

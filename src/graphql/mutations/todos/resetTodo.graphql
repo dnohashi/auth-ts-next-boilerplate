@@ -1,0 +1,5 @@
+mutation ResetTodo($id: String!) {
+  resetTodo(id: $id) {
+    ...TodoResponseFragment
+  }
+}
