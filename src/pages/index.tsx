@@ -31,7 +31,7 @@ const Index = () => {
 
   return (
     <>
-      <RowContainer paddingLeft={8} paddingRight={8}>
+      <RowContainer paddingLeft={16} paddingRight={16}>
         <Typography as="h2" fontSize={30} align="center" fontWeight={700}>
           Welcome {data?.me.user.username}!
         </Typography>
