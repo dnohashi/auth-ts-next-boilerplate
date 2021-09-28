@@ -3,12 +3,16 @@ import { Form, Formik } from 'formik';
 import Button from 'ui/components/Button';
 import InputField from 'ui/components/InputField';
 import Typography from 'ui/components/Typography';
-import { useCreateTodoMutation } from 'generated/graphql';
+import { Todo, useCreateTodoMutation } from 'generated/graphql';
 import handleErrors from 'helpers/handleErrors';
 import Card from 'ui/components/Card';
 import RowContainer from 'ui/components/RowContainer';
 
-const CreateTodo = ({ onCreate }): JSX.Element => {
+interface ICreateTodoCardProps {
+  onCreate: (todo: Todo) => void;
+}
+
+const CreateTodo = ({ onCreate }: ICreateTodoCardProps): JSX.Element => {
   const [createTodo] = useCreateTodoMutation();
 
   const initialValues = {

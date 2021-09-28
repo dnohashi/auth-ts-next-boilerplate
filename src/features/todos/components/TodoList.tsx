@@ -1,6 +1,18 @@
+import { Todo } from 'generated/graphql';
+
 import EditTodoCard from './EditTodoCard';
 import Container from 'ui/components/Container';
 import TodoCard from './TodoCard';
+
+interface ITodoListProps {
+  editId?: string | null;
+  todos: Todo[];
+  onComplete: (id: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+  onReset: (id: string) => Promise<void>;
+  onSetEdit: (id: string) => void;
+  onUpdate: (todo: Todo) => Promise<void>;
+}
 
 const TodoList = ({
   editId,
@@ -10,48 +22,23 @@ const TodoList = ({
   onReset,
   onSetEdit,
   onUpdate,
-}) => {
-  const handleOnComplete = (id) => () => {
-    onComplete(id);
-  };
-
-  const handleOnDelete = (id) => () => {
-    onDelete(id);
-  };
-
-  const handleOnSetEdit = (id) => () => {
-    onSetEdit(id);
-  };
-
-  const handleOnReset = (id) => () => {
-    onReset(id);
-  };
-
+}: ITodoListProps): JSX.Element => {
   return (
     <Container>
-      {todos.map(
-        ({
-          id,
-          title,
-          completedAt,
-        }: {
-          id: string;
-          title: string;
-          completedAt?: Date;
-        }) =>
-          editId === id ? (
-            <EditTodoCard key={id} id={id} title={title} onUpdate={onUpdate} />
-          ) : (
-            <TodoCard
-              key={id}
-              title={title}
-              completedAt={completedAt}
-              onDelete={handleOnDelete(id)}
-              onSetEdit={handleOnSetEdit(id)}
-              onComplete={handleOnComplete(id)}
-              onReset={handleOnReset(id)}
-            />
-          )
+      {todos.map(({ id, title, completedAt }: Todo) =>
+        editId === id ? (
+          <EditTodoCard key={id} id={id} title={title} onUpdate={onUpdate} />
+        ) : (
+          <TodoCard
+            key={id}
+            title={title}
+            completedAt={completedAt}
+            onDelete={() => onDelete(id)}
+            onSetEdit={() => onSetEdit(id)}
+            onComplete={() => onComplete(id)}
+            onReset={() => onReset(id)}
+          />
+        )
       )}
     </Container>
   );

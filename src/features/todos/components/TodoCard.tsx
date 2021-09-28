@@ -3,6 +3,15 @@ import Card from 'ui/components/Card';
 import RowContainer from 'ui/components/RowContainer';
 import Typography from 'ui/components/Typography';
 
+interface TodoCardProps {
+  completedAt?: Date;
+  title: string;
+  onDelete: (id: string) => void;
+  onReset: (id: string) => void;
+  onSetEdit: (id: string) => void;
+  onComplete: (todo: Todo) => Promise<void>;
+}
+
 const TodoCard = ({
   completedAt,
   title,
@@ -10,7 +19,7 @@ const TodoCard = ({
   onSetEdit,
   onComplete,
   onReset,
-}) => {
+}: TodoCardProps) => {
   return (
     <Card>
       <Typography as="h4" fontSize={20}>

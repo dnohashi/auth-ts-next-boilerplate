@@ -2,12 +2,18 @@ import * as Yup from 'yup';
 import { Form, Formik } from 'formik';
 import Button from 'ui/components/Button';
 import InputField from 'ui/components/InputField';
-import { useUpdateTodoMutation } from 'generated/graphql';
+import { Todo, useUpdateTodoMutation } from 'generated/graphql';
 import handleErrors from 'helpers/handleErrors';
 import Card from 'ui/components/Card';
 import RowContainer from 'ui/components/RowContainer';
 
-const EditTodoCard = ({ id, title, onUpdate }): JSX.Element => {
+interface IEditTodoCard {
+  id: string;
+  title: string;
+  onUpdate: (todo: Todo) => Promise<void>;
+}
+
+const EditTodoCard = ({ id, title, onUpdate }: IEditTodoCard): JSX.Element => {
   const [updateTodo] = useUpdateTodoMutation();
 
   const initialValues = {

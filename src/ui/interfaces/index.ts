@@ -23,7 +23,7 @@ export interface ButtonProps {
   disabled?: boolean;
   as?: React.ElementType | keyof JSX.IntrinsicElements;
   href?: string;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onClick?: (arg: any) => void; // Should accept any
   dataCy?: string;
   width?: number;
   height?: number;
