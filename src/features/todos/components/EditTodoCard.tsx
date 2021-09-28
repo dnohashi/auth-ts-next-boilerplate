@@ -10,7 +10,7 @@ import RowContainer from 'ui/components/RowContainer';
 interface IEditTodoCard {
   id: string;
   title: string;
-  onUpdate: (todo: Todo) => Promise<void>;
+  onUpdate: (todo: Todo) => void;
 }
 
 const EditTodoCard = ({ id, title, onUpdate }: IEditTodoCard): JSX.Element => {

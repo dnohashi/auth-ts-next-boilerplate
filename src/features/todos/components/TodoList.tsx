@@ -11,7 +11,7 @@ interface ITodoListProps {
   onDelete: (id: string) => Promise<void>;
   onReset: (id: string) => Promise<void>;
   onSetEdit: (id: string) => void;
-  onUpdate: (todo: Todo) => Promise<void>;
+  onUpdate: (todo: Todo) => void;
 }
 
 const TodoList = ({

@@ -31,7 +31,7 @@ const Todos = (): JSX.Element => {
   }, [data?.todos?.todos]);
 
   // Handlers
-  const handleAddTodos = async (todo: Todo): void => {
+  const handleAddTodos = (todo: Todo): void => {
     setTodosById((previousTodosById: Todo) => ({
       ...previousTodosById,
       [todo.id]: todo,
@@ -68,7 +68,7 @@ const Todos = (): JSX.Element => {
     });
   };
 
-  const handleUpdateTodo = async (updatedTodo: Todo) => {
+  const handleUpdateTodo = (updatedTodo: Todo): void => {
     setTodosById((previousTodosById: Todo) => {
       previousTodosById[updatedTodo.id] = { ...updatedTodo };
 
@@ -82,7 +82,7 @@ const Todos = (): JSX.Element => {
     setEditId(id);
   };
 
-  const handleResetTodo = async (id: string) => {
+  const handleResetTodo = async (id: string): Promise<void> => {
     const response = await resetTodo({
       variables: {
         id,
