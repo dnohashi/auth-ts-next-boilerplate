@@ -21,7 +21,7 @@ const TodoCard = ({
   onSetEdit,
   onComplete,
   onReset,
-}: TodoCardProps) => {
+}: TodoCardProps): JSX.Element => {
   return (
     <Card>
       <Typography as="h4" fontSize={20}>

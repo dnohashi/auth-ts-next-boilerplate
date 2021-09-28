@@ -1,11 +1,16 @@
 import * as Yup from 'yup';
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikHelpers } from 'formik';
 import Button from 'ui/components/Button';
 import InputField from 'ui/components/InputField';
-import { Todo, useUpdateTodoMutation } from 'generated/graphql';
+import {
+  MutationUpdateTodoArgs,
+  Todo,
+  useUpdateTodoMutation,
+} from 'generated/graphql';
 import handleErrors from 'helpers/handleErrors';
 import Card from 'ui/components/Card';
 import RowContainer from 'ui/components/RowContainer';
+import { ICreateTodoFormInput } from '../interfaces';
 
 interface IEditTodoCard {
   id: string;
@@ -24,12 +29,13 @@ const EditTodoCard = ({ id, title, onUpdate }: IEditTodoCard): JSX.Element => {
     title: Yup.string().required(),
   });
 
-  async function handleOnSubmit(values, { setErrors, setSubmitting }) {
+  async function handleOnSubmit(
+    values: ICreateTodoFormInput,
+    { setErrors, setSubmitting }: FormikHelpers<any>
+  ) {
+    const variables: MutationUpdateTodoArgs = { id, data: { ...values } };
     const response = await updateTodo({
-      variables: {
-        id,
-        data: { ...values },
-      },
+      variables,
     });
 
     const errors = response.data?.updateTodo.errors;
@@ -39,7 +45,7 @@ const EditTodoCard = ({ id, title, onUpdate }: IEditTodoCard): JSX.Element => {
       setErrors(handleErrors(errors));
       setSubmitting(false);
     } else if (todo) {
-      onUpdate(todo);
+      onUpdate(todo as Todo);
     }
   }
 

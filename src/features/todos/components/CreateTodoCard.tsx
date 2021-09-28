@@ -1,12 +1,17 @@
 import * as Yup from 'yup';
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikHelpers } from 'formik';
 import Button from 'ui/components/Button';
 import InputField from 'ui/components/InputField';
 import Typography from 'ui/components/Typography';
-import { Todo, useCreateTodoMutation } from 'generated/graphql';
+import {
+  MutationCreateTodoArgs,
+  Todo,
+  useCreateTodoMutation,
+} from 'generated/graphql';
 import handleErrors from 'helpers/handleErrors';
 import Card from 'ui/components/Card';
 import RowContainer from 'ui/components/RowContainer';
+import { ICreateTodoFormInput } from '../interfaces';
 
 interface ICreateTodoCardProps {
   onCreate: (todo: Todo) => void;
@@ -24,13 +29,12 @@ const CreateTodo = ({ onCreate }: ICreateTodoCardProps): JSX.Element => {
   });
 
   async function handleOnSubmit(
-    values,
-    { resetForm, setErrors, setSubmitting }
+    values: ICreateTodoFormInput,
+    { resetForm, setErrors, setSubmitting }: FormikHelpers<any>
   ) {
+    const variables: MutationCreateTodoArgs = { data: { ...values } };
     const response = await createTodo({
-      variables: {
-        data: { ...values },
-      },
+      variables,
     });
 
     const errors = response.data?.createTodo.errors;
@@ -40,8 +44,8 @@ const CreateTodo = ({ onCreate }: ICreateTodoCardProps): JSX.Element => {
       setErrors(handleErrors(errors));
       setSubmitting(false);
     } else if (todo) {
-      onCreate(todo);
-      resetForm(initialValues);
+      onCreate(todo as Todo);
+      resetForm(initialValues as any);
     }
   }
 
