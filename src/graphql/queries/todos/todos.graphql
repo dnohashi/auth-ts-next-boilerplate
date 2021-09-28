@@ -1,5 +1,5 @@
-query todos {
-  todos {
+query todos($limit: Float!, $offset: Float!) {
+  todos(limit: $limit, offset: $offset) {
     ...TodosResponseFragment
   }
 }

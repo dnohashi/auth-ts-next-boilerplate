@@ -88,6 +88,11 @@ export type Query = {
   getUser?: Maybe<UserResponse>;
 };
 
+export type QueryTodosArgs = {
+  offset: Scalars['Float'];
+  limit: Scalars['Float'];
+};
+
 export type QueryGetUserArgs = {
   params: UserGetInput;
 };
@@ -189,6 +194,17 @@ export enum UserType {
   NormalUser = 'NORMAL_USER',
 }
 
+export type UserResponseFragmentFragment = {
+  __typename?: 'UserResponse';
+} & Pick<UserResponse, 'message'> & {
+    errors?: Maybe<
+      Array<{ __typename?: 'FormError' } & Pick<FormError, 'field' | 'message'>>
+    >;
+    user?: Maybe<
+      { __typename?: 'User' } & Pick<User, 'id' | 'email' | 'username'>
+    >;
+  };
+
 export type TodoResponseFragmentFragment = {
   __typename?: 'TodoResponse';
 } & Pick<TodoResponse, 'message'> & {
@@ -221,17 +237,6 @@ export type TodosResponseFragmentFragment = {
           | 'deletedAt'
         >
       >
-    >;
-  };
-
-export type UserResponseFragmentFragment = {
-  __typename?: 'UserResponse';
-} & Pick<UserResponse, 'message'> & {
-    errors?: Maybe<
-      Array<{ __typename?: 'FormError' } & Pick<FormError, 'field' | 'message'>>
-    >;
-    user?: Maybe<
-      { __typename?: 'User' } & Pick<User, 'id' | 'email' | 'username'>
     >;
   };
 
@@ -304,12 +309,29 @@ export type MeQuery = { __typename?: 'Query' } & {
   me?: Maybe<{ __typename?: 'UserResponse' } & UserResponseFragmentFragment>;
 };
 
-export type TodosQueryVariables = Exact<{ [key: string]: never }>;
+export type TodosQueryVariables = Exact<{
+  limit: Scalars['Float'];
+  offset: Scalars['Float'];
+}>;
 
 export type TodosQuery = { __typename?: 'Query' } & {
   todos: { __typename?: 'TodoResponse' } & TodosResponseFragmentFragment;
 };
 
+export const UserResponseFragmentFragmentDoc = gql`
+  fragment UserResponseFragment on UserResponse {
+    errors {
+      field
+      message
+    }
+    message
+    user {
+      id
+      email
+      username
+    }
+  }
+`;
 export const TodoResponseFragmentFragmentDoc = gql`
   fragment TodoResponseFragment on TodoResponse {
     errors {
@@ -341,20 +363,6 @@ export const TodosResponseFragmentFragmentDoc = gql`
       updatedAt
       completedAt
       deletedAt
-    }
-  }
-`;
-export const UserResponseFragmentFragmentDoc = gql`
-  fragment UserResponseFragment on UserResponse {
-    errors {
-      field
-      message
-    }
-    message
-    user {
-      id
-      email
-      username
     }
   }
 `;
@@ -796,8 +804,8 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const TodosDocument = gql`
-  query todos {
-    todos {
+  query todos($limit: Float!, $offset: Float!) {
+    todos(limit: $limit, offset: $offset) {
       ...TodosResponseFragment
     }
   }
@@ -816,11 +824,13 @@ export const TodosDocument = gql`
  * @example
  * const { data, loading, error } = useTodosQuery({
  *   variables: {
+ *      limit: // value for 'limit'
+ *      offset: // value for 'offset'
  *   },
  * });
  */
 export function useTodosQuery(
-  baseOptions?: Apollo.QueryHookOptions<TodosQuery, TodosQueryVariables>
+  baseOptions: Apollo.QueryHookOptions<TodosQuery, TodosQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<TodosQuery, TodosQueryVariables>(
