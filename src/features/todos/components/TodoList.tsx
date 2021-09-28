@@ -1,5 +1,6 @@
+import { memo } from 'react';
+import isEqual from 'lodash/isEqual';
 import { Todo } from 'generated/graphql';
-
 import EditTodoCard from './EditTodoCard';
 import Container from 'ui/components/Container';
 import TodoCard from './TodoCard';
@@ -44,4 +45,4 @@ const TodoList = ({
   );
 };
 
-export default TodoList;
+export default memo(TodoList, (prev, next) => isEqual(prev.todos, next.todos));

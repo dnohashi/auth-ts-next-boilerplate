@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import CreateTodoCard from 'features/todos/components/CreateTodoCard';
 import {
   Todo,
@@ -23,6 +23,8 @@ const Todos = (): JSX.Element => {
   const [deleteTodo] = useDeleteTodoMutation();
   const [resetTodo] = useResetTodoMutation();
   const { data, loading } = useTodosQuery();
+
+  const memoizedTodos = useMemo(() => Object.values(todosById), [todosById]);
 
   // Lifecycle
   useEffect(() => {
@@ -101,7 +103,7 @@ const Todos = (): JSX.Element => {
       ) : (
         <TodoList
           editId={editId}
-          todos={Object.values(todosById as Todo)}
+          todos={memoizedTodos as Todo[]}
           onDelete={handleDeleteTodo}
           onComplete={handleCompleteTodo}
           onUpdate={handleUpdateTodo}
