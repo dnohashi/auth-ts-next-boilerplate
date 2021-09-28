@@ -21,7 +21,7 @@ interface IEditTodoCard {
 const EditTodoCard = ({ id, title, onUpdate }: IEditTodoCard): JSX.Element => {
   const [updateTodo] = useUpdateTodoMutation();
 
-  const initialValues = {
+  const initialValues: ICreateTodoFormInput = {
     title,
   };
 
@@ -32,7 +32,7 @@ const EditTodoCard = ({ id, title, onUpdate }: IEditTodoCard): JSX.Element => {
   async function handleOnSubmit(
     values: ICreateTodoFormInput,
     { setErrors, setSubmitting }: FormikHelpers<any>
-  ) {
+  ): Promise<void> {
     const variables: MutationUpdateTodoArgs = { id, data: { ...values } };
     const response = await updateTodo({
       variables,

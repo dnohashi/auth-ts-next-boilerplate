@@ -20,7 +20,7 @@ interface ICreateTodoCardProps {
 const CreateTodo = ({ onCreate }: ICreateTodoCardProps): JSX.Element => {
   const [createTodo] = useCreateTodoMutation();
 
-  const initialValues = {
+  const initialValues: ICreateTodoFormInput = {
     title: '',
   };
 
@@ -31,7 +31,7 @@ const CreateTodo = ({ onCreate }: ICreateTodoCardProps): JSX.Element => {
   async function handleOnSubmit(
     values: ICreateTodoFormInput,
     { resetForm, setErrors, setSubmitting }: FormikHelpers<any>
-  ) {
+  ): Promise<void> {
     const variables: MutationCreateTodoArgs = { data: { ...values } };
     const response = await createTodo({
       variables,
