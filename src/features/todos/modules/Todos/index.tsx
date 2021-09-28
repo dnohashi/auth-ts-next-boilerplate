@@ -7,6 +7,7 @@ import {
   useDeleteTodoMutation,
   useTodosQuery,
 } from 'generated/graphql';
+import cloneDeep from 'lodash/cloneDeep';
 import keyBy from 'lodash/keyBy';
 import TodoList from 'features/todos/components/TodoList';
 import Container from 'ui/components/Container';
@@ -14,7 +15,7 @@ import Spinner from 'ui/components/Spinner';
 
 const Todos = (): JSX.Element => {
   // Local state
-  const [todosById, setTodosById] = useState<Todo | unknown>({});
+  const [todosById, setTodosById] = useState({});
   const [editId, setEditId] = useState<string | null>(null);
 
   // GraphQL
@@ -32,10 +33,9 @@ const Todos = (): JSX.Element => {
 
   // Handlers
   const handleAddTodos = (todo: Todo): void => {
-    setTodosById((previousTodosById: Todo) => ({
-      ...previousTodosById,
-      [todo.id]: todo,
-    }));
+    const updatedTodosById = { [todo.id]: todo, ...(todosById as Todo) };
+
+    setTodosById(updatedTodosById);
   };
 
   const handleDeleteTodo = async (id: string): Promise<void> => {
@@ -45,11 +45,18 @@ const Todos = (): JSX.Element => {
       },
     });
 
-    setTodosById((previousTodosById: Todo) => {
-      delete previousTodosById[id];
+    const clonedTodosById: Todo = cloneDeep(todosById as Todo);
+    delete clonedTodosById[id];
 
-      return { ...previousTodosById };
-    });
+    setTodosById(clonedTodosById);
+  };
+
+  const updateTodoById = (id: string, todo: Todo = {} as Todo): void => {
+    const clonedTodosById = cloneDeep(todosById);
+
+    clonedTodosById[id] = todo;
+
+    setTodosById(clonedTodosById);
   };
 
   const handleCompleteTodo = async (id: string): Promise<void> => {
@@ -61,25 +68,13 @@ const Todos = (): JSX.Element => {
 
     const completedTodo = response.data?.completeTodo?.todo ?? {};
 
-    setTodosById((previousTodosById: Todo) => {
-      previousTodosById[id] = { ...completedTodo };
-
-      return { ...previousTodosById };
-    });
+    updateTodoById(id, completedTodo as Todo);
   };
 
   const handleUpdateTodo = (updatedTodo: Todo): void => {
-    setTodosById((previousTodosById: Todo) => {
-      previousTodosById[updatedTodo.id] = { ...updatedTodo };
-
-      return { ...previousTodosById };
-    });
+    updateTodoById(updatedTodo.id, updatedTodo);
 
     setEditId(null);
-  };
-
-  const handleSetEdit = (id: string): void => {
-    setEditId(id);
   };
 
   const handleResetTodo = async (id: string): Promise<void> => {
@@ -89,13 +84,13 @@ const Todos = (): JSX.Element => {
       },
     });
 
-    const updatedTodo = response.data?.resetTodo?.todo ?? {};
+    const updatedTodo = response.data?.resetTodo?.todo ?? ({} as Todo);
 
-    setTodosById((previousTodosById: Todo) => {
-      previousTodosById[id] = { ...updatedTodo };
+    updateTodoById(updatedTodo.id, updatedTodo as Todo);
+  };
 
-      return { ...previousTodosById };
-    });
+  const handleSetEdit = (id: string): void => {
+    setEditId(id);
   };
 
   return (
@@ -106,7 +101,7 @@ const Todos = (): JSX.Element => {
       ) : (
         <TodoList
           editId={editId}
-          todos={Object.values(todosById)}
+          todos={Object.values(todosById as Todo)}
           onDelete={handleDeleteTodo}
           onComplete={handleCompleteTodo}
           onUpdate={handleUpdateTodo}
