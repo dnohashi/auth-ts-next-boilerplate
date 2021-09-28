@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import CreateTodoCard from 'features/todos/components/CreateTodoCard';
 import {
+  MutationCompleteTodoArgs,
+  MutationDeleteTodoArgs,
+  MutationResetTodoArgs,
   Todo,
+  TodoResponse,
   useResetTodoMutation,
   useCompleteTodoMutation,
   useDeleteTodoMutation,
@@ -41,11 +45,8 @@ const Todos = (): JSX.Element => {
   };
 
   const handleDeleteTodo = async (id: string): Promise<void> => {
-    await deleteTodo({
-      variables: {
-        id,
-      },
-    });
+    const variables: MutationDeleteTodoArgs = { id };
+    await deleteTodo({ variables });
 
     const clonedTodosById: Todo = cloneDeep(todosById as Todo);
     delete clonedTodosById[id];
@@ -62,10 +63,9 @@ const Todos = (): JSX.Element => {
   };
 
   const handleCompleteTodo = async (id: string): Promise<void> => {
+    const variables: MutationCompleteTodoArgs = { id };
     const response = await completeTodo({
-      variables: {
-        id,
-      },
+      variables,
     });
 
     const completedTodo = response.data?.completeTodo?.todo ?? {};
@@ -80,10 +80,9 @@ const Todos = (): JSX.Element => {
   };
 
   const handleResetTodo = async (id: string): Promise<void> => {
+    const variables: MutationResetTodoArgs = { id };
     const response = await resetTodo({
-      variables: {
-        id,
-      },
+      variables,
     });
 
     const updatedTodo = response.data?.resetTodo?.todo ?? ({} as Todo);
