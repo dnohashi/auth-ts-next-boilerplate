@@ -1,3 +1,5 @@
+import { Todo } from 'generated/graphql';
+
 import Button from 'ui/components/Button';
 import Card from 'ui/components/Card';
 import RowContainer from 'ui/components/RowContainer';

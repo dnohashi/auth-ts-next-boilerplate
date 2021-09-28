@@ -23,7 +23,10 @@ const CreateTodo = ({ onCreate }: ICreateTodoCardProps): JSX.Element => {
     title: Yup.string().required(),
   });
 
-  async function handleOnSubmit(values, { setErrors, setSubmitting }) {
+  async function handleOnSubmit(
+    values,
+    { resetForm, setErrors, setSubmitting }
+  ) {
     const response = await createTodo({
       variables: {
         data: { ...values },
@@ -38,6 +41,7 @@ const CreateTodo = ({ onCreate }: ICreateTodoCardProps): JSX.Element => {
       setSubmitting(false);
     } else if (todo) {
       onCreate(todo);
+      resetForm(initialValues);
     }
   }
 
