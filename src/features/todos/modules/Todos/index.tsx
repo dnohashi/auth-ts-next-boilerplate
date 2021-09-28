@@ -39,17 +39,19 @@ const Todos = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    const todos = data?.todos?.todos ?? [];
+    const todos = data?.todos?.todos;
 
-    // Add todos and update offset
-    if (todos.length > 0 && canPaginate) {
-      setTodosById({ ...todosById, ...keyBy(todos, 'id') });
-      setOffset((prevOffset) => prevOffset + MAX_LIMIT);
-    }
+    if (Array.isArray(todos)) {
+      // Add todos and update offset
+      if (todos.length) {
+        setTodosById({ ...todosById, ...keyBy(todos, 'id') });
+      }
 
-    // Restrict pagination if offset exceeds limit
-    if (offset - memoizedTodos.length > MAX_LIMIT) {
-      setCanPaginate(false);
+      if (todos.length === MAX_LIMIT) {
+        setOffset((prevOffset) => prevOffset + MAX_LIMIT);
+      } else {
+        setCanPaginate(false);
+      }
     }
   }, [loading]);
 
@@ -112,8 +114,6 @@ const Todos = (): JSX.Element => {
 
   const fetchTodosWithOffset = async () => {
     await getTodos({ variables: { limit: MAX_LIMIT, offset } });
-
-    setOffset((prevOffset) => prevOffset + MAX_LIMIT);
   };
 
   return (
