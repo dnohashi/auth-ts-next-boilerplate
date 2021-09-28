@@ -15,6 +15,13 @@ import keyBy from 'lodash/keyBy';
 import TodoList from 'features/todos/components/TodoList';
 import Container from 'ui/components/Container';
 import Spinner from 'ui/components/Spinner';
+import styled from 'styled-components';
+
+const TodoCardContainer = styled.div`
+  width: 100%;
+  height: 40vh;
+  overflow: auto;
+`;
 
 const Todos = (): JSX.Element => {
   // Local state
@@ -99,15 +106,17 @@ const Todos = (): JSX.Element => {
       {loading ? (
         <Spinner />
       ) : (
-        <TodoList
-          editId={editId}
-          todos={memoizedTodos as Todo[]}
-          onDelete={handleDeleteTodo}
-          onComplete={handleCompleteTodo}
-          onUpdate={handleUpdateTodo}
-          onSetEdit={handleSetEdit}
-          onReset={handleResetTodo}
-        />
+        <div style={{ height: '40vh', overflow: 'auto', width: '100%' }}>
+          <TodoList
+            editId={editId}
+            todos={memoizedTodos as Todo[]}
+            onDelete={handleDeleteTodo}
+            onComplete={handleCompleteTodo}
+            onUpdate={handleUpdateTodo}
+            onSetEdit={handleSetEdit}
+            onReset={handleResetTodo}
+          />
+        </div>
       )}
     </Container>
   );
