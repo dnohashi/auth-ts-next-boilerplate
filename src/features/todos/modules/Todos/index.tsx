@@ -5,7 +5,6 @@ import {
   MutationDeleteTodoArgs,
   MutationResetTodoArgs,
   Todo,
-  TodoResponse,
   useResetTodoMutation,
   useCompleteTodoMutation,
   useDeleteTodoMutation,
