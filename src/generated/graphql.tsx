@@ -146,6 +146,7 @@ export type TodoResponse = {
   errors?: Maybe<Array<FormError>>;
   todos?: Maybe<Array<Todo>>;
   todo?: Maybe<Todo>;
+  count?: Maybe<Scalars['Float']>;
   message?: Maybe<Scalars['String']>;
 };
 
@@ -221,7 +222,7 @@ export type TodoResponseFragmentFragment = {
 
 export type TodosResponseFragmentFragment = {
   __typename?: 'TodoResponse';
-} & Pick<TodoResponse, 'message'> & {
+} & Pick<TodoResponse, 'message' | 'count'> & {
     errors?: Maybe<
       Array<{ __typename?: 'FormError' } & Pick<FormError, 'field' | 'message'>>
     >;
@@ -364,6 +365,7 @@ export const TodosResponseFragmentFragmentDoc = gql`
       completedAt
       deletedAt
     }
+    count
   }
 `;
 export const LogoutDocument = gql`

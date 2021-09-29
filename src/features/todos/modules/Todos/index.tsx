@@ -20,10 +20,10 @@ const MAX_LIMIT = 5;
 
 const Todos = (): JSX.Element => {
   // Local state
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
   const [offset, setOffset] = useState(MAX_LIMIT);
-  const [canPaginate, setCanPaginate] = useState(true);
+  const [totalTodos, setTotalTodos] = useState(0);
 
   // GraphQL
   const [completeTodo] = useCompleteTodoMutation();
@@ -32,14 +32,16 @@ const Todos = (): JSX.Element => {
   const { loading, error, fetchMore } = useTodosQuery({
     variables: { limit: MAX_LIMIT, offset: 0 },
     onCompleted: (response) => {
-      const todosFromServer = response?.todos?.todos ?? ([] as Todo[]);
+      const todosFromServer = (response?.todos?.todos ?? []) as Todo[];
 
       setTodos([...todos, ...todosFromServer]);
+      setTotalTodos((response?.todos?.count ?? 0) as number);
     },
   });
 
   // Handlers
   const handleAddTodos = (todo: Todo): void => {
+    setTotalTodos(totalTodos + 1);
     setTodos([todo, ...todos]);
   };
 
@@ -98,19 +100,17 @@ const Todos = (): JSX.Element => {
     const response = await fetchMore({
       variables: { limit: MAX_LIMIT, offset },
     });
-    const additionalTodos = response?.data?.todos?.todos;
+    const additionalTodos = (response?.data?.todos?.todos ?? []) as Todo[];
 
     setTodos([...todos, ...additionalTodos]);
     setOffset((prevOffset) => prevOffset + MAX_LIMIT);
-
-    if (additionalTodos?.length < MAX_LIMIT) {
-      setCanPaginate(false);
-    }
   };
 
   if (loading || error) {
     return <Spinner />;
   }
+
+  const fetchedAllTodos = todos.length === totalTodos;
 
   return (
     <Container>
@@ -135,9 +135,9 @@ const Todos = (): JSX.Element => {
       </div>
       <div style={{ marginTop: 4 }}>
         <Button
-          disabled={!canPaginate}
+          disabled={fetchedAllTodos}
           title="See more"
-          variant={canPaginate ? 'primary' : undefined}
+          variant={fetchedAllTodos ? undefined : 'primary'}
           size="large"
           onClick={fetchAdditionalTodos}
         />
