@@ -12,4 +12,5 @@ fragment TodosResponseFragment on TodoResponse {
     completedAt
     deletedAt
   }
+  count
 }

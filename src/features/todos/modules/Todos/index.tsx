@@ -21,18 +21,16 @@ import { PaginationControlsProps } from 'ui/components/PaginationControls';
 const MAX_LIMIT = 5;
 
 const Todos = ({
-  canPaginate,
   currentPage,
-  offset,
-  totalPages,
-  onUpdateCanPaginate,
-  onUpdateCurrentPage,
-  onUpdateOffset,
-  onUpdateTotalPages,
+  totalItems,
+  onSetTotalItems,
+  onNext,
+  onPrevious,
 }: PaginationControlsProps): JSX.Element => {
   // Local state
   const [todos, setTodos] = useState<Todo[]>([] as Todo[]);
   const [editId, setEditId] = useState<string | null>(null);
+  const [nextDisabled, setNextDisabled] = useState(false);
 
   // GraphQL
   const [completeTodo] = useCompleteTodoMutation();
@@ -42,14 +40,23 @@ const Todos = ({
     variables: { limit: MAX_LIMIT, offset: 0 },
     onCompleted: (response) => {
       const todosFromServer = (response?.todos?.todos ?? []) as Todo[];
+      const totalItems: number = response?.todos?.count ?? 0;
 
-      setTodos([...todos, ...todosFromServer]);
+      if (todosFromServer.length >= totalItems) {
+        setNextDisabled(true);
+      }
+
+      if (todosFromServer.length) {
+        setTodos(todosFromServer);
+      }
+
+      onSetTotalItems(totalItems);
     },
   });
 
   // Handlers
-  const handleAddTodos = (todo: Todo): void => {
-    setTodos([todo, ...todos]);
+  const handleAddTodos = (): void => {
+    fetchAdditionalTodos(0, false);
   };
 
   const handleDeleteTodo = async (id: string): Promise<void> => {
@@ -103,40 +110,46 @@ const Todos = ({
     setEditId(id);
   };
 
-  const fetchAdditionalTodos = async () => {
+  const fetchAdditionalTodos = async (
+    fetchOffset: number,
+    shouldDisable: boolean
+  ) => {
     const response = await fetchMore({
-      variables: { limit: MAX_LIMIT, offset },
+      variables: { limit: MAX_LIMIT, offset: fetchOffset },
     });
     const additionalTodos = response?.data?.todos?.todos as Todo[];
 
-    if (additionalTodos?.length) {
-      onUpdateTotalPages();
-      setTodos([...todos, ...additionalTodos]);
-      onUpdateOffset();
+    if (additionalTodos.length < MAX_LIMIT || shouldDisable) {
+      setNextDisabled(true);
+    } else if (nextDisabled) {
+      setNextDisabled(false);
     }
 
-    if (additionalTodos?.length < MAX_LIMIT) {
-      onUpdateCanPaginate(false);
+    if (additionalTodos?.length) {
+      setTodos(additionalTodos);
     }
   };
 
-  const handleOnClickPrevious = () => {
-    !canPaginate && onUpdateCanPaginate(true);
-    onUpdateCurrentPage(currentPage - 1);
+  // Pagination
+  const handleOnClickPrevious = async () => {
+    const offset = (currentPage - 1) * MAX_LIMIT;
+    const shouldDisableNext = false;
+
+    await fetchAdditionalTodos(offset, shouldDisableNext);
+    onPrevious();
   };
 
   const handleOnClickNext = async () => {
-    await fetchAdditionalTodos();
-    onUpdateCurrentPage(currentPage + 1);
+    const offset = (currentPage + 1) * MAX_LIMIT;
+    const shouldDisableNext = MAX_LIMIT + offset >= totalItems;
+
+    await fetchAdditionalTodos(offset, shouldDisableNext);
+    onNext();
   };
 
   if (loading || error) {
     return <Spinner />;
   }
-
-  const startIndex = (currentPage - 1) * MAX_LIMIT;
-  const endIndex = currentPage * MAX_LIMIT;
-  const todosToRender = todos.slice(startIndex, endIndex);
 
   return (
     <Container>
@@ -151,7 +164,7 @@ const Todos = ({
       >
         <TodoList
           editId={editId}
-          todos={todosToRender}
+          todos={todos}
           onDelete={handleDeleteTodo}
           onComplete={handleCompleteTodo}
           onUpdate={handleUpdateTodo}
@@ -162,13 +175,13 @@ const Todos = ({
       <div style={{ marginTop: 12, width: '100%' }}>
         <RowContainer>
           <Button
-            disabled={currentPage === 1}
+            disabled={currentPage === 0}
             title="Go back"
             size="large"
             onClick={handleOnClickPrevious}
           />
           <Button
-            disabled={totalPages * MAX_LIMIT < todos.length && !canPaginate}
+            disabled={nextDisabled}
             title="Go forward"
             size="large"
             onClick={handleOnClickNext}
