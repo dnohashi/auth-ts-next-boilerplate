@@ -15,15 +15,22 @@ import TodoList from 'features/todos/components/TodoList';
 import Button from 'ui/components/Button';
 import Container from 'ui/components/Container';
 import Spinner from 'ui/components/Spinner';
+import RowContainer from 'ui/components/RowContainer';
+import { PaginationControlsProps } from 'ui/components/PaginationControls';
 
 const MAX_LIMIT = 5;
 
-const Todos = (): JSX.Element => {
+const Todos = ({
+  currentPage,
+  totalItems,
+  onSetTotalItems,
+  onNext,
+  onPrevious,
+}: PaginationControlsProps): JSX.Element => {
   // Local state
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([] as Todo[]);
   const [editId, setEditId] = useState<string | null>(null);
-  const [offset, setOffset] = useState(MAX_LIMIT);
-  const [totalTodos, setTotalTodos] = useState(0);
+  const [nextDisabled, setNextDisabled] = useState(false);
 
   // GraphQL
   const [completeTodo] = useCompleteTodoMutation();
@@ -33,16 +40,23 @@ const Todos = (): JSX.Element => {
     variables: { limit: MAX_LIMIT, offset: 0 },
     onCompleted: (response) => {
       const todosFromServer = (response?.todos?.todos ?? []) as Todo[];
+      const totalItems: number = response?.todos?.count ?? 0;
 
-      setTodos([...todos, ...todosFromServer]);
-      setTotalTodos((response?.todos?.count ?? 0) as number);
+      if (todosFromServer.length >= totalItems) {
+        setNextDisabled(true);
+      }
+
+      if (todosFromServer.length) {
+        setTodos(todosFromServer);
+      }
+
+      onSetTotalItems(totalItems);
     },
   });
 
   // Handlers
-  const handleAddTodos = (todo: Todo): void => {
-    setTotalTodos(totalTodos + 1);
-    setTodos([todo, ...todos]);
+  const handleAddTodos = (): void => {
+    fetchAdditionalTodos(0, false);
   };
 
   const handleDeleteTodo = async (id: string): Promise<void> => {
@@ -96,21 +110,46 @@ const Todos = (): JSX.Element => {
     setEditId(id);
   };
 
-  const fetchAdditionalTodos = async () => {
+  const fetchAdditionalTodos = async (
+    fetchOffset: number,
+    shouldDisable: boolean
+  ) => {
     const response = await fetchMore({
-      variables: { limit: MAX_LIMIT, offset },
+      variables: { limit: MAX_LIMIT, offset: fetchOffset },
     });
-    const additionalTodos = (response?.data?.todos?.todos ?? []) as Todo[];
+    const additionalTodos = response?.data?.todos?.todos as Todo[];
 
-    setTodos([...todos, ...additionalTodos]);
-    setOffset((prevOffset) => prevOffset + MAX_LIMIT);
+    if (additionalTodos.length < MAX_LIMIT || shouldDisable) {
+      setNextDisabled(true);
+    } else if (nextDisabled) {
+      setNextDisabled(false);
+    }
+
+    if (additionalTodos?.length) {
+      setTodos(additionalTodos);
+    }
+  };
+
+  // Pagination
+  const handleOnClickPrevious = async () => {
+    const offset = (currentPage - 1) * MAX_LIMIT;
+    const shouldDisableNext = false;
+
+    await fetchAdditionalTodos(offset, shouldDisableNext);
+    onPrevious();
+  };
+
+  const handleOnClickNext = async () => {
+    const offset = (currentPage + 1) * MAX_LIMIT;
+    const shouldDisableNext = MAX_LIMIT + offset >= totalItems;
+
+    await fetchAdditionalTodos(offset, shouldDisableNext);
+    onNext();
   };
 
   if (loading || error) {
     return <Spinner />;
   }
-
-  const fetchedAllTodos = todos.length === totalTodos;
 
   return (
     <Container>
@@ -120,7 +159,7 @@ const Todos = (): JSX.Element => {
           height: '40vh',
           overflow: 'auto',
           display: 'flex',
-          flexDirection: `${offset > MAX_LIMIT ? 'column-reverse' : 'column'}`,
+          flexDirection: 'column',
         }}
       >
         <TodoList
@@ -133,14 +172,21 @@ const Todos = (): JSX.Element => {
           onReset={handleResetTodo}
         />
       </div>
-      <div style={{ marginTop: 4 }}>
-        <Button
-          disabled={fetchedAllTodos}
-          title="See more"
-          variant={fetchedAllTodos ? undefined : 'primary'}
-          size="large"
-          onClick={fetchAdditionalTodos}
-        />
+      <div style={{ marginTop: 12, width: '100%' }}>
+        <RowContainer>
+          <Button
+            disabled={currentPage === 0}
+            title="Go back"
+            size="large"
+            onClick={handleOnClickPrevious}
+          />
+          <Button
+            disabled={nextDisabled}
+            title="Go forward"
+            size="large"
+            onClick={handleOnClickNext}
+          />
+        </RowContainer>
       </div>
     </Container>
   );

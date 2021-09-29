@@ -7,6 +7,9 @@ import Button from 'ui/components/Button';
 import RowContainer from 'ui/components/RowContainer';
 import Loading from 'ui/components/Loading';
 import Typography from 'ui/components/Typography';
+import PaginationControls, {
+  PaginationControlsProps,
+} from 'ui/components/PaginationControls';
 import { withApollo } from 'utils/withApollo';
 
 const Index = () => {
@@ -43,7 +46,9 @@ const Index = () => {
           onClick={handleLogout}
         />
       </RowContainer>
-      <Todos />
+      <PaginationControls>
+        {(props: PaginationControlsProps) => <Todos {...props} />}
+      </PaginationControls>
     </>
   );
 };
