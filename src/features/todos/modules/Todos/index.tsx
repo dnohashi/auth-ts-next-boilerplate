@@ -23,6 +23,7 @@ const MAX_LIMIT = 5;
 const Todos = ({
   currentPage,
   totalItems,
+  onResetCurrentPage,
   onSetTotalItems,
   onNext,
   onPrevious,
@@ -56,20 +57,21 @@ const Todos = ({
 
   // Handlers
   const handleAddTodos = (): void => {
+    onResetCurrentPage();
     fetchAdditionalTodos(0, false);
   };
 
   const handleDeleteTodo = async (id: string): Promise<void> => {
     const variables: MutationDeleteTodoArgs = { id };
+    const expectedCount = totalItems - 1;
+    const willDecrementTotalPages = currentPage * MAX_LIMIT >= expectedCount;
+    const offset =
+      (willDecrementTotalPages ? currentPage - 1 : currentPage) * MAX_LIMIT;
 
     await deleteTodo({ variables });
 
-    const clonedTodos: Todo[] = cloneDeep(todos);
-    const index = clonedTodos.findIndex((clonedTodo) => clonedTodo.id === id);
-
-    clonedTodos.splice(index, 1);
-
-    setTodos(clonedTodos);
+    fetchAdditionalTodos(offset, willDecrementTotalPages);
+    willDecrementTotalPages && onPrevious();
   };
 
   const updateTodo = (id: string, todo: Todo = {} as Todo): void => {
@@ -110,6 +112,7 @@ const Todos = ({
     setEditId(id);
   };
 
+  // Pagination
   const fetchAdditionalTodos = async (
     fetchOffset: number,
     shouldDisable: boolean
@@ -117,6 +120,7 @@ const Todos = ({
     const response = await fetchMore({
       variables: { limit: MAX_LIMIT, offset: fetchOffset },
     });
+
     const additionalTodos = response?.data?.todos?.todos as Todo[];
     const count = response.data?.todos?.count ?? totalItems;
 
@@ -130,12 +134,9 @@ const Todos = ({
       setTodos(additionalTodos);
     }
 
-    if (count > totalItems) {
-      onSetTotalItems(count);
-    }
+    onSetTotalItems(count);
   };
 
-  // Pagination
   const handleOnClickPrevious = async () => {
     const offset = (currentPage - 1) * MAX_LIMIT;
     const shouldDisableNext = false;
