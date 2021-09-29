@@ -3,6 +3,7 @@ import { useState } from 'react';
 export interface PaginationControlsProps {
   currentPage: number;
   totalItems: number;
+  onResetCurrentPage: () => void;
   onSetTotalItems: (total: number) => void;
   onNext: () => void;
   onPrevious: () => void;
@@ -19,6 +20,7 @@ function Pagination({ children }: IProps) {
   const props: PaginationControlsProps = {
     currentPage,
     totalItems,
+    onResetCurrentPage: () => setCurrentPage(0),
     onSetTotalItems: (total: number): void => setTotalItems(total),
     onNext: () => {
       const expectedPage = currentPage + 1;
