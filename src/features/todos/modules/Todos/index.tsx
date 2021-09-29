@@ -118,6 +118,7 @@ const Todos = ({
       variables: { limit: MAX_LIMIT, offset: fetchOffset },
     });
     const additionalTodos = response?.data?.todos?.todos as Todo[];
+    const count = response.data?.todos?.count ?? totalItems;
 
     if (additionalTodos.length < MAX_LIMIT || shouldDisable) {
       setNextDisabled(true);
@@ -127,6 +128,10 @@ const Todos = ({
 
     if (additionalTodos?.length) {
       setTodos(additionalTodos);
+    }
+
+    if (count > totalItems) {
+      onSetTotalItems(count);
     }
   };
 
