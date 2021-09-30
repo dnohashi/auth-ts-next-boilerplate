@@ -39,7 +39,7 @@ const Todos = ({
   const { loading, error, fetchMore } = useTodosQuery({
     variables: { limit: MAX_LIMIT, offset: 0 },
     onCompleted: (response) => {
-      const todosFromServer = (response?.todos?.todos ?? []) as Todo[];
+      const todosFromServer: Todo[] = (response?.todos?.todos ?? []) as Todo[];
       const totalItems: number = response?.todos?.count ?? 0;
 
       if (todosFromServer.length >= totalItems) {
@@ -66,8 +66,9 @@ const Todos = ({
     const variables: MutationDeleteTodoArgs = { id };
     const expectedCount: number = totalItems - 1;
     // Decrement if expected count is at the boundary of the current page
-    const willDecrementTotalPages = currentPage * MAX_LIMIT === expectedCount;
-    const offset =
+    const willDecrementTotalPages: boolean =
+      currentPage * MAX_LIMIT === expectedCount;
+    const offset: number =
       (willDecrementTotalPages ? currentPage - 1 : currentPage) * MAX_LIMIT;
 
     await deleteTodo({ variables });
@@ -79,11 +80,15 @@ const Todos = ({
   // Find todo to update by ID and replace
   const updateTodo = (id: string, todo: Todo = {} as Todo): void => {
     const clonedTodos = cloneDeep(todos);
-    const index = clonedTodos.findIndex((clonedTodo) => clonedTodo.id === id);
+    const index: number = clonedTodos.findIndex(
+      (clonedTodo) => clonedTodo.id === id
+    );
 
-    clonedTodos[index] = { ...todo };
+    if (index > -1) {
+      clonedTodos[index] = { ...todo };
 
-    setTodos(clonedTodos);
+      setTodos(clonedTodos);
+    }
   };
 
   // Make request to patch a Todo
@@ -92,9 +97,10 @@ const Todos = ({
     const response = await completeTodo({
       variables,
     });
-    const completedTodo = response.data?.completeTodo?.todo ?? {};
+    const completedTodo: Todo = (response.data?.completeTodo?.todo ??
+      {}) as Todo;
 
-    updateTodo(id, completedTodo as Todo);
+    updateTodo(id, completedTodo);
   };
 
   // Make request to patch Todo and reset edited card
@@ -109,7 +115,7 @@ const Todos = ({
     const response = await resetTodo({
       variables,
     });
-    const updatedTodo = response.data?.resetTodo?.todo ?? ({} as Todo);
+    const updatedTodo: Todo = (response.data?.resetTodo?.todo ?? {}) as Todo;
 
     updateTodo(updatedTodo.id, updatedTodo as Todo);
   };
@@ -128,8 +134,9 @@ const Todos = ({
       variables: { limit: MAX_LIMIT, offset: fetchOffset },
     });
 
-    const additionalTodos = response?.data?.todos?.todos as Todo[];
-    const count = response.data?.todos?.count ?? totalItems;
+    const additionalTodos: Todo[] = (response?.data?.todos?.todos ??
+      []) as Todo[];
+    const count: number = (response.data?.todos?.count as number) ?? totalItems;
 
     if (additionalTodos.length < MAX_LIMIT || shouldDisable) {
       setNextDisabled(true);
@@ -146,7 +153,7 @@ const Todos = ({
 
   // Determine offset and make request to fetch previous page of Todos
   const handleOnClickPrevious = async () => {
-    const offset = (currentPage - 1) * MAX_LIMIT;
+    const offset: number = (currentPage - 1) * MAX_LIMIT;
     const shouldDisableNext = false;
     await fetchAdditionalTodos(offset, shouldDisableNext);
     onPrevious();
@@ -155,9 +162,9 @@ const Todos = ({
   // Determine offset and make request to fetch next page of Todos
   // Disable if subsequent fetch will exceed total records
   const handleOnClickNext = async () => {
-    const offset = (currentPage + 1) * MAX_LIMIT;
+    const offset: number = (currentPage + 1) * MAX_LIMIT;
     // Disable if max capcity of next page is >= to total
-    const shouldDisableNext =
+    const shouldDisableNext: boolean =
       offset >= totalItems || offset + MAX_LIMIT >= totalItems;
 
     await fetchAdditionalTodos(offset, shouldDisableNext);

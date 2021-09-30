@@ -39,13 +39,13 @@ const EditTodoCard = ({ id, title, onUpdate }: IEditTodoCard): JSX.Element => {
     });
 
     const errors = response.data?.updateTodo.errors;
-    const todo = response.data?.updateTodo.todo;
+    const todo: Todo = response.data?.updateTodo.todo as Todo;
 
     if (errors) {
       setErrors(handleErrors(errors));
       setSubmitting(false);
     } else if (todo) {
-      onUpdate(todo as Todo);
+      onUpdate(todo);
     }
   }
 

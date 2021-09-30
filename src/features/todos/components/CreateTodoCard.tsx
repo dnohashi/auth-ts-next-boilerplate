@@ -38,7 +38,7 @@ const CreateTodo = ({ onCreate }: ICreateTodoCardProps): JSX.Element => {
     });
 
     const errors = response.data?.createTodo.errors;
-    const todo = response.data?.createTodo.todo;
+    const todo: Todo = response.data?.createTodo.todo as Todo;
 
     if (errors) {
       setErrors(handleErrors(errors));
