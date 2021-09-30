@@ -64,9 +64,9 @@ const Todos = ({
   // Make request to set deletedAt and update state and pagination
   const handleDeleteTodo = async (id: string): Promise<void> => {
     const variables: MutationDeleteTodoArgs = { id };
-    const expectedCount = totalItems - 1;
-    // Determine if new total fits within the capacity of the previous page
-    const willDecrementTotalPages = currentPage * MAX_LIMIT >= expectedCount;
+    const expectedCount: number = totalItems - 1;
+    // Decrement if expected count is at the boundary of the current page
+    const willDecrementTotalPages = currentPage * MAX_LIMIT === expectedCount;
     const offset =
       (willDecrementTotalPages ? currentPage - 1 : currentPage) * MAX_LIMIT;
 
@@ -148,7 +148,6 @@ const Todos = ({
   const handleOnClickPrevious = async () => {
     const offset = (currentPage - 1) * MAX_LIMIT;
     const shouldDisableNext = false;
-
     await fetchAdditionalTodos(offset, shouldDisableNext);
     onPrevious();
   };
@@ -157,7 +156,9 @@ const Todos = ({
   // Disable if subsequent fetch will exceed total records
   const handleOnClickNext = async () => {
     const offset = (currentPage + 1) * MAX_LIMIT;
-    const shouldDisableNext = offset >= totalItems;
+    // Disable if max capcity of next page is >= to total
+    const shouldDisableNext =
+      offset >= totalItems || offset + MAX_LIMIT >= totalItems;
 
     await fetchAdditionalTodos(offset, shouldDisableNext);
     onNext();
