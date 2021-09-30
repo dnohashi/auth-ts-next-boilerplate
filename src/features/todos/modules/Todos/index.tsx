@@ -22,9 +22,7 @@ const MAX_LIMIT = 5;
 
 const Todos = ({
   currentPage,
-  totalItems,
   onResetCurrentPage,
-  onSetTotalItems,
   onNext,
   onPrevious,
 }: PaginationControlsProps): JSX.Element => {
@@ -32,6 +30,7 @@ const Todos = ({
   const [todos, setTodos] = useState<Todo[]>([] as Todo[]);
   const [editId, setEditId] = useState<string | null>(null);
   const [nextDisabled, setNextDisabled] = useState(false);
+  const [totalItems, setTotalItems] = useState(1);
 
   // GraphQL
   const [completeTodo] = useCompleteTodoMutation();
@@ -51,19 +50,22 @@ const Todos = ({
         setTodos(todosFromServer);
       }
 
-      onSetTotalItems(totalItems);
+      setTotalItems(totalItems);
     },
   });
 
   // Handlers
+  // Fetch with offset 0 and set page to 1 in order to fetch most recent subset
   const handleAddTodos = (): void => {
     onResetCurrentPage();
     fetchAdditionalTodos(0, false);
   };
 
+  // Make request to set deletedAt and update state and pagination
   const handleDeleteTodo = async (id: string): Promise<void> => {
     const variables: MutationDeleteTodoArgs = { id };
     const expectedCount = totalItems - 1;
+    // Determine if new total fits within the capacity of the previous page
     const willDecrementTotalPages = currentPage * MAX_LIMIT >= expectedCount;
     const offset =
       (willDecrementTotalPages ? currentPage - 1 : currentPage) * MAX_LIMIT;
@@ -74,6 +76,7 @@ const Todos = ({
     willDecrementTotalPages && onPrevious();
   };
 
+  // Find todo to update by ID and replace
   const updateTodo = (id: string, todo: Todo = {} as Todo): void => {
     const clonedTodos = cloneDeep(todos);
     const index = clonedTodos.findIndex((clonedTodo) => clonedTodo.id === id);
@@ -83,6 +86,7 @@ const Todos = ({
     setTodos(clonedTodos);
   };
 
+  // Make request to patch a Todo
   const handleCompleteTodo = async (id: string): Promise<void> => {
     const variables: MutationCompleteTodoArgs = { id };
     const response = await completeTodo({
@@ -93,11 +97,13 @@ const Todos = ({
     updateTodo(id, completedTodo as Todo);
   };
 
+  // Make request to patch Todo and reset edited card
   const handleUpdateTodo = (updatedTodo: Todo): void => {
     updateTodo(updatedTodo.id, updatedTodo);
     setEditId(null);
   };
 
+  // Make request to patch Todo
   const handleResetTodo = async (id: string): Promise<void> => {
     const variables: MutationResetTodoArgs = { id };
     const response = await resetTodo({
@@ -113,6 +119,7 @@ const Todos = ({
   };
 
   // Pagination
+  // Request list with limit and offset
   const fetchAdditionalTodos = async (
     fetchOffset: number,
     shouldDisable: boolean
@@ -134,9 +141,10 @@ const Todos = ({
       setTodos(additionalTodos);
     }
 
-    onSetTotalItems(count);
+    setTotalItems(count);
   };
 
+  // Determine offset and make request to fetch previous page of Todos
   const handleOnClickPrevious = async () => {
     const offset = (currentPage - 1) * MAX_LIMIT;
     const shouldDisableNext = false;
@@ -145,9 +153,11 @@ const Todos = ({
     onPrevious();
   };
 
+  // Determine offset and make request to fetch next page of Todos
+  // Disable if subsequent fetch will exceed total records
   const handleOnClickNext = async () => {
     const offset = (currentPage + 1) * MAX_LIMIT;
-    const shouldDisableNext = MAX_LIMIT + offset >= totalItems;
+    const shouldDisableNext = offset >= totalItems;
 
     await fetchAdditionalTodos(offset, shouldDisableNext);
     onNext();
